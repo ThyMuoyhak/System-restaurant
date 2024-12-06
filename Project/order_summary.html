@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Summary</title>
+
+    <!-- Google Font: Khmer Font (Nokora) -->
+    <link href="https://fonts.googleapis.com/css2?family=Nokora&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Nokora', sans-serif; /* Khmer Font */
+        }
+    </style>
+</head>
+<body  style="font-family: 'Khmer', sans-serif;" class="bg-pink-600 from-indigo-100 to-indigo-300 text-gray-800 font-sans">
+
+    <div class="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-12 border-t-8 border-indigo-500">
+        <h1 class="text-4xl font-extrabold text-center text-indigo-600 mb-8">បញ្ជីរការកម្មង់របស់អ្នក</h1>
+
+        <!-- User Details Section -->
+        <div id="userDetails" class="mb-10">
+            <h2 class="text-2xl font-bold text-indigo-600 border-b-2 border-indigo-200 pb-2 mb-6">User Details</h2>
+        </div>
+
+        <!-- Cart Summary Section -->
+        <div id="cartSummary" class="mb-10">
+            <h2 class="text-2xl font-bold text-indigo-600 border-b-2 border-indigo-200 pb-2 mb-6">Cart Items</h2>
+            <ul id="cartItems" class="space-y-6"></ul>
+            <p class="mt-6 text-xl font-semibold text-right">
+                <strong>ទឹកប្រាក់សរុប:</strong> 
+                <span class="text-indigo-600">$<span id="totalPrice">0.00</span></span>
+            </p>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center">
+            <button style="border-radius: 10px;" onclick="submitOrder()" 
+                class="inline-block bg-pink-600 text-white text-lg font-medium py-3 px-8  shadow-md hover:bg-pink-800 transition-all duration-300 ease-in-out hover:scale-90">
+                ត្រឡប់ទៅវិញ
+            </button>
+            <a href="index.html"><button style="border-radius: 10px;"  
+                class="inline-block bg-pink-600 text-white text-lg font-medium py-3 px-8  shadow-md hover:bg-pink-800 transition-all duration-300 ease-in-out hover:scale-90">
+                បញ្ជូនទៅកាន់ចុងភៅ
+            </button></a>
+        </div>
+        
+    </div>
+
+    <script>
+        // Retrieve user details and cart data from localStorage
+        const userDetails = JSON.parse(localStorage.getItem('userDetails')) || {};
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // Display user details
+        document.getElementById('userDetails').innerHTML = `
+            <p><strong>ID:</strong> ${userDetails.id}</p>
+            <p><strong>ឈ្មោះ:</strong> ${userDetails.name}</p>
+            <p><strong>ភេទ:</strong> ${userDetails.gender}</p>
+            <p><strong>លេខទូរស័ព្ធ:</strong> ${userDetails.phone}</p>
+            <p><strong>លេខតុ:</strong> ${userDetails.table}</p>
+        `;
+
+        // Display cart items
+        const cartItemsList = document.getElementById('cartItems');
+        let totalPrice = 0;
+
+        cart.forEach(item => {
+            const li = document.createElement('li');
+            li.classList.add('flex', 'justify-between', 'items-center', 'border-b', 'border-indigo-200', 'py-3');
+            li.innerHTML = `
+                <span class="font-semibold">${item.name}</span>
+                <span class="text-indigo-600">$${item.price.toFixed(2)}</span>
+            `;
+            cartItemsList.appendChild(li);
+            totalPrice += item.price;
+        });
+
+        // Display total price
+        document.getElementById('totalPrice').textContent = totalPrice.toFixed(2);
+
+        // Function to submit order and save to localStorage
+        function submitOrder() {
+            // Retrieve the last used ID from localStorage, or start with 1 if it's the first user
+            let lastId = localStorage.getItem('lastUserId');
+            lastId = lastId ? parseInt(lastId) : 0; // If no ID exists, start from 0
+            
+            // Increment the ID for the new user
+            const newId = lastId + 1;
+            
+            // Save the new ID as the last used ID in localStorage
+            localStorage.setItem('lastUserId', newId);
+            
+            // Prepare the order data
+            const orderData = {
+                id: newId, // Use the incremented ID
+                name: userDetails.name,
+                gender: userDetails.gender,
+                phone: userDetails.phone,
+                table: userDetails.table,
+                total: totalPrice.toFixed(2),
+                cart: cart
+            };
+
+            // Retrieve all users from localStorage or initialize it as an empty array
+            const allUsers = JSON.parse(localStorage.getItem('allUsers')) || [];
+            
+            // Add the current user to the list of all users
+            allUsers.push(orderData);
+            localStorage.setItem('allUsers', JSON.stringify(allUsers));
+
+            // Redirect to the all_users.html page
+            window.location.href = 'all_users.html';
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Guests</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-pink-600 from-green-50 to-green-100 text-gray-800 font-sans">
+
+    <div class="max-w-6xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-12">
+        <h1 class="text-4xl  font-extrabold text-center text-pink-600 mb-8">All Guests</h1>
+
+        <table class="w-full text-left border-collapse border border-pink-300">
+            <thead>
+                <tr>
+                    <th class="border border-pink-300 px-4 py-2 bg-pink-200">User ID</th>
+                    <th class="border border-pink-300 px-4 py-2 bg-pink-200">Name</th>
+                    <th class="border border-pink-300 px-4 py-2 bg-pink-200">Gender</th>
+                    <th class="border border-pink-300 px-4 py-2 bg-pink-200">Phone</th>
+                    <th class="border border-pink-300 px-4 py-2 bg-pink-200">Table</th>
+                    <th class="border border-pink-300 px-4 py-2 bg-pink-200">Total</th>
+                    <th class="border border-pink-300 px-4 py-2 bg-pink-200">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="usersTable"></tbody>
+        </table>
+    </div>
+
+    <!-- Modal for viewing user details -->
+    <div id="userModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-lg p-8 w-96 space-y-6">
+            <h2 class="text-2xl font-bold text-pink-600 mb-4">Guests Details</h2>
+            <div id="userDetailsContent"></div>
+            <button onclick="closeModal()" class="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Retrieve all users from localStorage
+        const allUsers = JSON.parse(localStorage.getItem('allUsers')) || [];
+        const usersTable = document.getElementById('usersTable');
+
+        // Populate the table with user data and add buttons for view
+        allUsers.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="border border-pink-300 px-4 py-2">${user.id}</td>
+                <td class="border border-pink-300 px-4 py-2">${user.name}</td>
+                <td class="border border-pink-300 px-4 py-2">${user.gender}</td>
+                <td class="border border-pink-300 px-4 py-2">${user.phone}</td>
+                <td class="border border-pink-300 px-4 py-2">${user.table}</td>
+                <td class="border border-pink-300 px-4 py-2">$${user.total}</td>
+                <td class="border border-pink-300 px-4 py-2">
+                    <button onclick="viewUser(${user.id})" class="bg-blue-500 text-white px-4 py-2 rounded-md">View</button>
+                    <button onclick="deleteUser(${user.id})" class="bg-red-500 text-white px-4 py-2 rounded-md">Delete</button>
+                </td>
+            `;
+            usersTable.appendChild(row);
+        });
+
+        // Function to view a user's full details and cart items in a modal
+        function viewUser(userId) {
+            const user = allUsers.find(user => user.id === userId);
+            if (user) {
+                // Prepare the user details and cart items content
+                const userDetails = `
+                    <p><strong>User ID:</strong> ${user.id}</p>
+                    <p><strong>Name:</strong> ${user.name}</p>
+                    <p><strong>Gender:</strong> ${user.gender}</p>
+                    <p><strong>Phone:</strong> ${user.phone}</p>
+                    <p><strong>Table:</strong> ${user.table}</p>
+                    <p><strong>Total:</strong> $${user.total}</p>
+                `;
+
+                // Add cart items to the modal
+                let cartItemsContent = '<h3 class="text-xl font-semibold text-green-600">Cart Items:</h3>';
+                if (user.cart && user.cart.length > 0) {
+                    user.cart.forEach(item => {
+                        cartItemsContent += `
+                            <div class="border-b-2 border-green-200 py-2">
+                                <p><strong>Item:</strong> ${item.name}</p>
+                                <p><strong>Quantity:</strong> ${item.quantity}</p>
+                                <p><strong>Price:</strong> $${(item.price * item.quantity).toFixed(2)}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    cartItemsContent += "<p>No items in cart.</p>";
+                }
+
+                // Combine user details and cart items into one content block
+                document.getElementById('userDetailsContent').innerHTML = userDetails + cartItemsContent;
+
+                // Show the modal
+                const modal = document.getElementById('userModal');
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            const modal = document.getElementById('userModal');
+            modal.style.display = 'none';
+            modal.classList.add('hidden');
+        }
+
+        // Function to delete a user
+        function deleteUser(userId) {
+            const updatedUsers = allUsers.filter(user => user.id !== userId);
+            localStorage.setItem('allUsers', JSON.stringify(updatedUsers));
+            location.reload();
+        }
+    </script>
+</body>
+</html>

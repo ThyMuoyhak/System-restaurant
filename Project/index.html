@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Panda</title>
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Khmer Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Khmer:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans" style="font-family: 'Khmer', sans-serif;">
+
+<!-- Navbar (Mobile-Friendly) -->
+<nav class="bg-pink-600 shadow-md sticky top-0 z-50">
+  <div class="container mx-auto flex justify-between items-center p-4">
+    <img width="100px" src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Foodpanda_logo_since_2017.jpeg" alt="Logo">
+    <button class="text-white lg:hidden">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
+    <div class="hidden lg:flex space-x-6">
+      <a class="text-white hover:bg-pink-700 px-4 py-2 rounded-md transition duration-300" href="index.html">អាហារ</a>
+      <a class="text-white hover:bg-pink-700 px-4 py-2 rounded-md transition duration-300" href="drink.html">ភេសជ្ជៈ</a>
+      <a class="text-white hover:bg-pink-700 px-4 py-2 rounded-md transition duration-300" href="#">គ្រឿងសមុទ្រ</a>
+      <a class="text-white hover:bg-pink-700 px-4 py-2 rounded-md transition duration-300" href="#">មីហឹរ</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Modal for User Details -->
+<div id="userFormModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-8 w-full max-w-md shadow-lg">
+        <h2 class="text-2xl font-bold mb-4 text-center">ព័ត៌មានអំពីអ្នក</h2>
+        <form id="userForm">
+            <div class="mb-4">
+                <label for="name" class="block font-semibold mb-2">ឈ្មោះ</label>
+                <input type="text" id="name" class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500" required>
+            </div>
+            <div class="mb-4">
+                <label for="gender" class="block font-semibold mb-2">ភេទ</label>
+                <select id="gender" class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500" required>
+                    <option value="male">ប្រុស</option>
+                    <option value="female">ស្រី</option>
+                    <option value="other">ផ្សេងៗ</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="phone" class="block font-semibold mb-2">លេខទូរស័ព្ទ</label>
+                <input type="tel" id="phone" class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500" required>
+            </div>
+            <div class="mb-4">
+                <label for="table" class="block font-semibold mb-2">លេខតុ</label>
+                <input type="number" id="table" class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500" required>
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button type="button" onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">បោះបង់</button>
+                <button id="checkoutButton1" type="submit" class="bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-800">បញ្ជាក់</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Your Order Section -->
+<div class="container mx-auto mt-10 px-4">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+    <div>
+        <h2 class="text-center text-3xl font-bold mb-8">បញ្ជីមុខម្ហូបក្នុងហាង</h2>
+        <div class="h-screen overflow-y-auto">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="menuItems">
+                <!-- Dynamically generated food items will go here -->
+            </div>
+        </div>
+    </div>
+    
+    
+
+      <div class="sticky top-0">
+          <div class="bg-white p-6 rounded-lg shadow-lg">
+              <h5 class="text-2xl font-semibold mb-4">កន្លែងដែលអ្នកកម្មង់</h5>
+              <div id="orderDetails">
+                  <p class="text-gray-500">មិនមានធាតុបន្ថែមនៅឡើយទេ</p>
+              </div>
+              <div id="orderTotal" class="mt-4 text-xl font-semibold text-gray-800">
+                  <p><strong>Total: $0.00</strong></p>
+              </div>
+              <button id="checkoutButton" class="bg-pink-600 text-white p-2 mt-4 rounded-md hover:bg-pink-800 w-full">
+                  បញ្ចូល
+              </button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Cart Button (Fixed on Bottom Right) -->
+<div id="cartButton" class="fixed bottom-4 right-4 bg-pink-500 text-white text-xl p-4 rounded-full shadow-lg hover:bg-pink-600 cursor-pointer transition duration-300">
+    <i class="fas fa-shopping-cart"></i> កម្មង់
+</div>
+
+<!-- Cart Sidebar -->
+<div id="cartSidebar" class="fixed top-0 right-[-400px] h-full w-[400px] bg-white shadow-xl p-6 transition-all ease-in-out duration-300 overflow-y-auto z-50">
+    <button class="absolute top-4 left-4 text-2xl text-gray-700" onclick="closeCartSidebar()">×</button>
+    <h4 class="text-2xl font-semibold mb-4">ធាតុក្នុងរទេះ</h4>
+    <ul id="cartItemsList" class="list-none space-y-4">
+        <!-- Cart items will be listed here -->
+    </ul>
+    <div id="cartTotal">
+        <p class="font-semibold text-lg"><strong>ទឹកប្រាក់សរុប: $0.00</strong></p>
+    </div>
+    <button id="checkoutButtonSidebar" class="bg-pink-600 text-white p-2 mt-4 rounded-md hover:bg-pink-800 w-full">
+        បញ្ចូល
+    </button>
+</div>
+
+<!-- Toast Notification -->
+<div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-4">
+    <!-- Toast notifications will appear here -->
+</div>
+
+<script>
+   // Function to generate menu items dynamically
+   function generateMenuItems() {
+    const menuContainer = document.getElementById('menuItems');
+    menuItems.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg', 'text-center', 'cursor-pointer', 'hover:bg-pink-100');
+        itemElement.innerHTML = `
+            <h3 class="text-xl font-semibold">${item.name}</h3>
+            <p class="text-lg text-gray-500">$${item.price.toFixed(2)}</p>
+        `;
+        itemElement.addEventListener('click', () => addToCart(item)); // Attach event listener to add item to cart
+        menuContainer.appendChild(itemElement);
+    });
+}
+
+// Function to add items to the cart
+function addToCart(productId) {
+    // Find the product by its ID
+    const product = products.find(p => p.id === productId);
+    
+    // Add the product to the cart array
+    cart.push(product);
+    
+    // Display the updated cart details
+    displayCartItems();
+}
+
+// Call the function to generate menu items on page load
+generateMenuItems();
+</script>
+
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<script>
+    // Sample list of products (food items)
+const products = [
+{ id: 1, name: "សាច់គោទឹកប្រហុក", price: 5.99, image: "https://www.shutterstock.com/image-photo/beef-prohok-sauce-cambodia-food-260nw-2471213891.jpg" },
+{ id: 2, name: "សាច់ឆ្អឹងជីនីជ្រូក", price: 9.99, image: "https://nextfoodstop.wordpress.com/wp-content/uploads/2015/06/20150615_120829.jpg?w=584&h=329" },
+{ id: 3, name: "បាយឡុកឡាក់", price: 7.49, image: "https://images.deliveryhero.io/image/fd-kh/Products/2075160.jpg?width=%s" },
+{ id: 4, name: "បាយឡុកឡាក់", price: 4.49, image: "https://www.fodors.com/ee/images/article/lok_lak.jpg" },
+{ id: 5, name: "ឆាក្ដៅសាច់មាន់", price: 4.49, image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiQHyIqx7OVgcU7-f5PTPSm22PaCx8mV7zuxN9wNyYGwW8jTsTr_P0K18Y5YFYQJfLVFVebNxsk00iq7iaoH0cVRhJbDrfJf7nwQUARJXlUYwa8ZvFnZOMCZEJtTu47kXiOXwHc02kUG0Ff/s1600/17523360_715923851901546_2171140692656135111_n.jpg" },
+{ id: 6, name: "ឆាក្ដៅទាកាប៉ា", price: 4.49, image: "https://storage.googleapis.com/takeapp/media/clyip3rad00070cjt9q411vrp.jpeg" },
+{ id: 7, name: "បាយឡុកឡាក់", price: 4.49, image: "https://www.fodors.com/ee/images/article/lok_lak.jpg" },
+{ id: 8, name: "ឆាក្ដៅសាច់មាន់", price: 4.49, image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiQHyIqx7OVgcU7-f5PTPSm22PaCx8mV7zuxN9wNyYGwW8jTsTr_P0K18Y5YFYQJfLVFVebNxsk00iq7iaoH0cVRhJbDrfJf7nwQUARJXlUYwa8ZvFnZOMCZEJtTu47kXiOXwHc02kUG0Ff/s1600/17523360_715923851901546_2171140692656135111_n.jpg" },
+{ id: 9, name: "ឆាក្ដៅទាកាប៉ា", price: 4.49, image: "https://storage.googleapis.com/takeapp/media/clyip3rad00070cjt9q411vrp.jpeg" },
+
+];
+
+let cart = JSON.parse(localStorage.getItem('cart')) || []; // Retrieve cart from localStorage or create an empty array
+
+// Function to add items to the cart
+function addToCart(productId) {
+    const product = products.find(p => p.id === productId);
+
+    if (product) {
+        // Check if the product is already in the cart
+        const existingProduct = cart.find(item => item.id === productId);
+        if (existingProduct) {
+            existingProduct.quantity += 1; // Increase quantity if product already in cart
+        } else {
+            // Add product to the cart with quantity of 1
+            cart.push({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                quantity: 1
+            });
+        }
+
+        // Save the updated cart to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        // Optionally show a message that the item was added to the cart
+        showToast('Item added to cart');
+
+        // Update the cart display
+        updateOrderSummary();
+    }
+}
+
+// Function to show a toast message
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.classList.add('toast', 'bg-green-500', 'text-white', 'p-4', 'rounded');
+    toast.innerText = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// Function to update the order summary and cart sidebar
+function updateOrderSummary() {
+    const orderDetails = document.getElementById('orderDetails');
+    const cartItemsList = document.getElementById('cartItemsList');
+    const cartTotal = document.getElementById('orderTotal');
+
+    // Clear current order details
+    orderDetails.innerHTML = '';
+    cartItemsList.innerHTML = '';
+
+    // If cart is empty
+    if (cart.length === 0) {
+        orderDetails.innerHTML = '<p class="text-gray-500">មិនមានធាតុបន្ថែមនៅឡើយទេ</p>';
+        cartTotal.innerHTML = '<p><strong>Total: $0.00</strong></p>';
+    } else {
+        let totalAmount = 0;
+
+        cart.forEach(item => {
+            totalAmount += item.price * item.quantity;
+
+            // Create the order item element
+            const orderItem = document.createElement('div');
+            orderItem.classList.add('flex', 'items-center', 'space-x-4', 'mb-4');
+            orderItem.innerHTML = `
+                <img class="w-16 h-16 object-cover rounded-md" src="${item.image}" alt="${item.name}">
+                <div class="flex-1">
+                    <span class="text-gray-800 font-semibold">${item.name} x ${item.quantity}</span>
+                    <span class="block text-gray-500">$${(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+                <button onclick="removeFromOrder(${item.id})" class="text-red-500 ml-4 hover:text-red-700 p-2 rounded-md border border-red-500">លុបចេញ</button>
+            `;
+            orderDetails.appendChild(orderItem);
+
+            // Create cart item list for the sidebar
+            const cartItem = document.createElement('li');
+            cartItem.classList.add('flex', 'justify-between');
+            cartItem.innerHTML = `
+                <span>${item.name} x ${item.quantity}</span>
+                <span>$${(item.price * item.quantity).toFixed(2)}</span>
+            `;
+            cartItemsList.appendChild(cartItem);
+        });
+
+        // Update the total price in the orderTotal section
+        cartTotal.innerHTML = `<p><strong>Total: $${totalAmount.toFixed(2)}</strong></p>`;
+    }
+}
+
+// Function to remove an item from the cart or decrease its quantity
+function removeFromOrder(productId) {
+    const productIndex = cart.findIndex(item => item.id === productId);
+    if (productIndex !== -1) {
+        cart[productIndex].quantity -= 1;
+        if (cart[productIndex].quantity === 0) {
+            cart.splice(productIndex, 1); // Remove item if quantity reaches 0
+        }
+        localStorage.setItem('cart', JSON.stringify(cart)); // Save to localStorage
+        updateOrderSummary(); // Update the order summary
+    }
+}
+
+// Initialize cart display when the page loads
+window.onload = function () {
+    updateOrderSummary();
+};
+
+
+
+// Function to show toast message
+function showToast(message) {
+const toastContainer = document.getElementById('toastContainer');
+const toast = document.createElement('div');
+toast.classList.add('bg-green-500', 'text-white', 'p-4', 'rounded-lg', 'shadow-lg', 'mb-4');
+toast.innerText = message;
+toastContainer.appendChild(toast);
+
+// Remove toast after 3 seconds
+setTimeout(() => {
+    toastContainer.removeChild(toast);
+}, 3000);
+}
+
+// Cart button click event
+document.getElementById('cartButton').onclick = function() {
+document.getElementById('cartSidebar').style.right = '0';
+};
+
+// Close cart sidebar
+function closeCartSidebar() {
+document.getElementById('cartSidebar').style.right = '-400px';
+}
+
+// Function to display cart items in the "កន្លែងដែលអ្នកកម្មង់" section
+function displayCartItems() {
+    const orderDetailsContainer = document.getElementById('orderDetails');
+    const orderTotalContainer = document.getElementById('orderTotal');
+
+    // Clear the current cart details
+    orderDetailsContainer.innerHTML = '';
+    
+    // If the cart is empty, display a message
+    if (cart.length === 0) {
+        orderDetailsContainer.innerHTML = '<p class="text-gray-500">មិនមានធាតុបន្ថែមនៅឡើយទេ</p>';
+        orderTotalContainer.innerHTML = '<p><strong>Total: $0.00</strong></p>';
+        return;
+    }
+
+    // Calculate the total price
+    let totalPrice = 0;
+    cart.forEach(product => {
+        totalPrice += product.price;
+        
+        // Create a display element for each product
+        const item = document.createElement('div');
+        item.classList.add('flex', 'items-center', 'mb-4');
+        item.innerHTML = `
+            <img src="${product.image}" alt="${product.name}" class="w-16 h-16 object-cover rounded-md mr-4">
+            <div>
+                <h4 class="text-lg font-semibold">${product.name}</h4>
+                <p class="text-gray-600">$${product.price}</p>
+            </div>
+        `;
+        orderDetailsContainer.appendChild(item);
+    });
+
+    // Update the total price in the orderTotal section
+    orderTotalContainer.innerHTML = `<p><strong>Total: $${totalPrice.toFixed(2)}</strong></p>`;
+}
+
+
+
+const menuItemsContainer = document.getElementById('menuItems');
+
+products.forEach(product => {
+    const item = document.createElement('div');
+    item.classList.add('bg-white', 'rounded-lg', 'shadow-md', 'p-4');
+    
+    item.innerHTML = `
+        <img class="w-full h-48 object-cover rounded-md" src="${product.image}" alt="${product.name}">
+        <h3 class="text-xl font-semibold mt-4">${product.name}</h3>
+        <p class="text-gray-600">$${product.price}</p>
+        <button onclick="addToCart(${product.id})" class="bg-pink-600 text-white px-4 py-2 mt-4 rounded-md hover:bg-pink-700">
+            កម្មង់មុខម្ហូប
+        </button>
+    `;
+    
+    menuItemsContainer.appendChild(item);
+});
+
+
+document.getElementById('checkoutButton1').addEventListener('click', () => {
+showLoading('Processing your order...');
+setTimeout(() => {
+    showToast('Your order was successful! Thank you for your purchase.');
+    hideLoading();
+}, 2000); // Simulate a 2-second processing delay
+});
+
+document.getElementById('checkoutButtonSidebar').addEventListener('click', () => {
+showLoading('Processing your order...');
+setTimeout(() => {
+    showToast('Your order was successful! Thank you for your purchase.');
+    hideLoading();
+}, 2000);
+});
+
+// Show loading spinner
+function showLoading(message) {
+const toastContainer = document.getElementById('toastContainer');
+const loadingToast = document.createElement('div');
+loadingToast.id = 'loadingToast';
+loadingToast.classList.add('bg-gray-900', 'text-white', 'p-4', 'rounded-lg', 'shadow-lg', 'flex', 'items-center', 'space-x-2');
+loadingToast.innerHTML = `
+    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+    </svg>
+    <span>${message}</span>
+`;
+toastContainer.appendChild(loadingToast);
+}
+
+// Hide loading spinner
+function hideLoading() {
+const loadingToast = document.getElementById('loadingToast');
+if (loadingToast) {
+    loadingToast.remove();
+}
+}
+
+// Show toast message
+function showToast(message) {
+const toastContainer = document.getElementById('toastContainer');
+const successToast = document.createElement('div');
+successToast.classList.add('bg-green-500', 'text-white', 'p-4', 'rounded-lg', 'shadow-lg', 'mb-4');
+successToast.innerText = message;
+toastContainer.appendChild(successToast);
+
+// Remove toast after 3 seconds
+setTimeout(() => {
+    successToast.remove();
+}, 3000);
+}
+
+
+document.getElementById('checkoutButton').addEventListener('click', () => {
+openModal();
+});
+
+document.getElementById('checkoutButtonSidebar').addEventListener('click', () => {
+openModal();
+});
+
+// Open modal
+function openModal() {
+const modal = document.getElementById('userFormModal');
+modal.classList.remove('hidden');
+}
+
+// Close modal
+function closeModal() {
+const modal = document.getElementById('userFormModal');
+modal.classList.add('hidden');
+}
+
+// Handle form submission
+document.getElementById('userForm').addEventListener('submit', (event) => {
+event.preventDefault();
+const name = document.getElementById('name').value;
+const gender = document.getElementById('gender').value;
+const phone = document.getElementById('phone').value;
+const table = document.getElementById('table').value;
+
+// Process the form data (e.g., send it to the server or display it)
+console.log({ name, gender, phone, table });
+
+// Close the modal after submission
+closeModal();
+
+// Show a success message
+showToast('Your order has been placed successfully!');
+});
+
+
+// Handle the form submission
+document.getElementById('userForm').addEventListener('submit', async function (e) {
+e.preventDefault();
+
+const name = document.getElementById('name').value;
+const gender = document.getElementById('gender').value;
+const phone = document.getElementById('phone').value;
+const table = document.getElementById('table').value;
+
+// Payload for submission
+const payload = {
+    name,
+    gender,
+    phone,
+    table,
+};
+
+// Send data to the backend
+const response = await fetch('/submit_order.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+});
+
+const result = await response.json();
+
+if (result.status === 'success') {
+    // Redirect to summary page
+    window.location.href = 'summary.html';
+} else {
+    alert('Error submitting order. Please try again.');
+}
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+let cart = [];
+const cartButton = document.getElementById('cartButton');
+const cartSidebar = document.getElementById('cartSidebar');
+const cartItemsList = document.getElementById('cartItemsList');
+const cartTotal = document.getElementById('cartTotal');
+const orderDetails = document.getElementById('orderDetails');
+const orderTotal = document.getElementById('orderTotal');
+
+// Handle Add to Cart
+document.querySelectorAll('.add-to-cart').forEach(button => {
+    button.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        const name = this.getAttribute('data-name');
+        const price = parseFloat(this.getAttribute('data-price'));
+
+        // Add item to cart
+        const item = { id, name, price };
+        cart.push(item);
+        updateCart();
+        showToast(`Added ${name} to the cart!`);
+    });
+});
+
+// Update cart display
+function updateCart() {
+    cartItemsList.innerHTML = '';
+    let total = 0;
+
+    cart.forEach(item => {
+        const listItem = document.createElement('li');
+        listItem.className = 'flex justify-between items-center';
+        listItem.innerHTML = `
+            <span>${item.name}</span>
+            <span>$${item.price.toFixed(2)}</span>
+        `;
+        cartItemsList.appendChild(listItem);
+        total += item.price;
+    });
+
+    cartTotal.innerHTML = `<p class="font-semibold text-lg"><strong>Total: $${total.toFixed(2)}</strong></p>`;
+    orderTotal.innerHTML = `<p><strong>Total: $${total.toFixed(2)}</strong></p>`;
+}
+
+// Open the cart sidebar
+cartButton.addEventListener('click', function() {
+    cartSidebar.style.right = '0';
+});
+
+// Close the cart sidebar
+function closeCartSidebar() {
+    cartSidebar.style.right = '-400px';
+}
+document.getElementById('checkoutButton').addEventListener('click', function () {
+    // Get the values from the form fields
+    const name = document.getElementById('name').value;
+    const gender = document.getElementById('gender').value;
+    const phone = document.getElementById('phone').value;
+    const table = document.getElementById('table').value;
+
+    // Validation: Check if any of the fields are empty
+    if (!name || !gender || !phone || !table) {
+        alert("សូមបំពេញទិន្នន័យទាំងអស់៖ ឈ្មោះ, ភេទ, ទូរស័ព្ទ, និងលេខតុ។");
+        return; // Stop the function if validation fails
+    }
+
+    // Retrieve existing users from localStorage
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+
+    // Create a new user object with a unique ID
+    const userId = users.length + 1; // Unique ID based on the length of the users array
+    const newUser = { id: userId, name, gender, phone, table };
+
+    // Add the new user to the users list
+    users.push(newUser);
+
+    // Save the updated users list to localStorage
+    localStorage.setItem('users', JSON.stringify(users));
+
+    // Retrieve the current cart from localStorage (if available)
+    const cart = JSON.parse(localStorage.getItem('cart')) || []; // Ensure cart is not undefined
+
+    // Store the current user's details and cart data
+    localStorage.setItem('userDetails', JSON.stringify(newUser)); // Save the current user
+    localStorage.setItem('cart', JSON.stringify(cart)); // Save cart items
+
+    // Redirect to Order Summary page
+    window.location.href = 'order_summary.html';
+});
+
+
+
+
+
+
+// Show Toast Notification
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'bg-green-500 text-white p-2 rounded-md mb-2';
+    toast.textContent = message;
+    document.getElementById('toastContainer').appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// Close Cart Sidebar
+function closeCartSidebar() {
+    cartSidebar.style.right = '-400px';
+}
+});
+
+</script>
+</body>
+</html>
